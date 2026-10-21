@@ -11,6 +11,8 @@ import invitesRoutes from './modules/invites/invites.routes.ts';
 import coursesRoutes from './modules/courses/courses.routes.ts';
 import tasksRoutes from './modules/tasks/tasks.routes.ts';
 import gamificationRoutes from './modules/gamification/gamification.routes.ts';
+import leaderboardRoutes from './modules/leaderboard/leaderboard.routes.ts';
+import teamsRoutes from './modules/teams/teams.routes.ts';
 
 const app = express();
 
@@ -48,6 +50,8 @@ app.use('/api/invites', invitesRoutes);
 app.use('/api/courses', coursesRoutes);
 app.use('/api/tasks', tasksRoutes);
 app.use('/api/gamification', gamificationRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
+app.use('/api/teams', teamsRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
