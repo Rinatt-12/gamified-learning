@@ -14,6 +14,8 @@ import gamificationRoutes from './modules/gamification/gamification.routes.ts';
 import leaderboardRoutes from './modules/leaderboard/leaderboard.routes.ts';
 import teamsRoutes from './modules/teams/teams.routes.ts';
 import aiRoutes from './modules/ai/ai.routes.ts';
+import notificationsRoutes from './modules/notifications/notifications.routes.ts';
+import analyticsRoutes from './modules/analytics/analytics.routes.ts';
 
 const app = express();
 
@@ -54,6 +56,8 @@ app.use('/api/gamification', gamificationRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/teams', teamsRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/notifications', notificationsRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
