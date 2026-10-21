@@ -1,0 +1,53 @@
+{
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успешно",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "back": "Назад",
+    "next": "Далее",
+    "submit": "Отправить",
+    "close": "Закрыть"
+  },
+  "auth": {
+    "login": "Вход",
+    "register": "Регистрация",
+    "logout": "Выход",
+    "email": "Email или телефон",
+    "password": "Пароль",
+    "name": "Имя",
+    "inviteCode": "Invite код",
+    "group": "Группа",
+    "specialty": "Специальность",
+    "loginButton": "Войти",
+    "registerButton": "Зарегистрироваться",
+    "haveAccount": "У вас есть аккаунт?",
+    "noAccount": "У вас нет аккаунта?",
+    "loginSuccess": "Успешный вход",
+    "registerSuccess": "Успешная регистрация"
+  },
+  "nav": {
+    "dashboard": "Главная",
+    "courses": "Курсы",
+    "leaderboard": "Рейтинг",
+    "teams": "Команды",
+    "profile": "Профиль",
+    "analytics": "Аналитика",
+    "students": "Студенты",
+    "manageCourses": "Управление курсами",
+    "invites": "Invite коды",
+    "users": "Пользователи"
+  },
+  "dashboard": {
+    "welcome": "Добро пожаловать",
+    "level": "Уровень",
+    "xp": "XP",
+    "streak": "Streak",
+    "achievements": "Достижения",
+    "dailyGoal": "Ежедневная цель",
+    "nextLevel": "До следующего уровня"
+  }
+}

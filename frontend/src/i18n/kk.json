@@ -1,0 +1,53 @@
+{
+  "common": {
+    "loading": "Жүктелуде...",
+    "error": "Қате",
+    "success": "Сәтті",
+    "save": "Сақтау",
+    "cancel": "Болдырмау",
+    "delete": "Өшіру",
+    "edit": "Өңдеу",
+    "back": "Артқа",
+    "next": "Келесі",
+    "submit": "Жіберу",
+    "close": "Жабу"
+  },
+  "auth": {
+    "login": "Кіру",
+    "register": "Тіркелу",
+    "logout": "Шығу",
+    "email": "Email немесе телефон",
+    "password": "Пароль",
+    "name": "Аты-жөні",
+    "inviteCode": "Invite код",
+    "group": "Топ",
+    "specialty": "Мамандық",
+    "loginButton": "Кіру",
+    "registerButton": "Тіркелу",
+    "haveAccount": "Аккаунтыңыз бар ма?",
+    "noAccount": "Аккаунтыңыз жоқ па?",
+    "loginSuccess": "Сәтті кірдіңіз",
+    "registerSuccess": "Сәтті тіркелдіңіз"
+  },
+  "nav": {
+    "dashboard": "Басты бет",
+    "courses": "Курстар",
+    "leaderboard": "Рейтинг",
+    "teams": "Командалар",
+    "profile": "Профиль",
+    "analytics": "Аналитика",
+    "students": "Студенттер",
+    "manageCourses": "Курстарды басқару",
+    "invites": "Invite кодтар",
+    "users": "Қолданушылар"
+  },
+  "dashboard": {
+    "welcome": "Қош келдіңіз",
+    "level": "Деңгей",
+    "xp": "XP",
+    "streak": "Streak",
+    "achievements": "Жетістіктер",
+    "dailyGoal": "Күнделікті мақсат",
+    "nextLevel": "Келесі деңгейге"
+  }
+}
