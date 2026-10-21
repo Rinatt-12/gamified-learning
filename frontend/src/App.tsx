@@ -15,6 +15,9 @@ import TeacherStudents from './pages/teacher/Students';
 import AIGenerator from './pages/teacher/AIGenerator';
 import TeacherAnalytics from './pages/teacher/Analytics';
 import AdminDashboard from './pages/admin/Dashboard';
+import AdminUsers from './pages/admin/Users';
+import AdminInvites from './pages/admin/Invites';
+import AdminAnalytics from './pages/admin/Analytics';
 
 function ProtectedRoute({ roles }: { roles?: Array<'STUDENT' | 'TEACHER' | 'ADMIN'> }) {
   const { isAuthenticated, user } = useAuthStore();
@@ -59,6 +62,9 @@ export default function App() {
 
           <Route element={<ProtectedRoute roles={['ADMIN']} />}>
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/invites" element={<AdminInvites />} />
+            <Route path="/admin/analytics" element={<AdminAnalytics />} />
           </Route>
         </Route>
       </Route>
