@@ -1,21 +1,18 @@
-import express from 'express';
-import dotenv from 'dotenv';
+import app from './app.js';
+import { env } from './config/env.js';
+import { connectDB } from './config/prisma.js';
 
-dotenv.config();
-
-const app = express();
-const PORT = process.env.PORT || 5000;
-
-app.use(express.json());
-
-app.get('/', (req, res) => {
-  res.json({
-    message: '🎮 Gamified Learning API жұмыс істейді!',
-    status: 'OK',
-    timestamp: new Date().toISOString(),
+async function start() {
+  await connectDB();
+  
+  app.listen(env.PORT, () => {
+    console.log(`\n🚀 Сервер іске қосылды: http://localhost:${env.PORT}`);
+    console.log(`📊 Орта: ${env.NODE_ENV}`);
+    console.log(`🌐 Frontend: ${env.FRONTEND_URL}\n`);
   });
-});
+}
 
-app.listen(PORT, () => {
-  console.log(`🚀 Сервер іске қосылды: http://localhost:${PORT}`);
+start().catch((err) => {
+  console.error('❌ Сервер қатесі:', err);
+  process.exit(1);
 });
