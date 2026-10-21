@@ -1,0 +1,404 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==================== ENUMS ====================
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+enum TaskType {
+  QUIZ
+  PRACTICE
+  THEORY
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+enum InviteStatus {
+  ACTIVE
+  USED
+  EXPIRED
+}
+
+enum TournamentStatus {
+  UPCOMING
+  ACTIVE
+  FINISHED
+}
+
+enum NotificationType {
+  XP_GAINED
+  LEVEL_UP
+  ACHIEVEMENT
+  NEW_TASK
+  DAILY_GOAL
+  AI_ADVICE
+  TOURNAMENT
+}
+
+// ==================== USERS ====================
+
+model User {
+  id        String   @id @default(cuid())
+  email     String?  @unique
+  phone     String?  @unique
+  password  String
+  name      String
+  avatarUrl String?
+  role      Role     @default(STUDENT)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  student Student?
+  teacher Teacher?
+  admin   Admin?
+
+  notifications Notification[]
+
+  @@index([email])
+  @@index([phone])
+}
+
+model Student {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group      String?
+  specialty  String?
+  courseYear Int?
+  xp         Int      @default(0)
+  level      Int      @default(1)
+  streakDays Int      @default(0)
+  lastActive DateTime @default(now())
+  teamId     String?
+  team       Team?    @relation(fields: [teamId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  attempts          Attempt[]
+  xpEvents          XpEvent[]
+  achievements      StudentAchievement[]
+  dailyGoals        DailyGoal[]
+  streak            Streak?
+  errorHistories    ErrorHistory[]
+  aiAnalyses        AiAnalysis[]
+  teamMemberships   TeamMember[]
+  tournamentMembers TournamentMember[]
+
+  @@index([xp])
+  @@index([level])
+  @@index([teamId])
+}
+
+model Teacher {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio       String?
+  createdAt DateTime @default(now())
+
+  courses Course[]
+
+  @@index([userId])
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+// ==================== INVITE CODES ====================
+
+model InviteCode {
+  id        String       @id @default(cuid())
+  code      String       @unique
+  status    InviteStatus @default(ACTIVE)
+  expiresAt DateTime?
+  usedAt    DateTime?
+  usedBy    String?
+  createdBy String
+  createdAt DateTime     @default(now())
+
+  @@index([code])
+  @@index([status])
+}
+
+// ==================== COURSES ====================
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  coverUrl    String?
+  isPublished Boolean  @default(false)
+  teacherId   String
+  teacher     Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  topics Topic[]
+
+  @@index([teacherId])
+}
+
+model Topic {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  orderIndex  Int      @default(0)
+  icon        String?
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  levels Level[]
+
+  @@index([courseId])
+}
+
+model Level {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  orderIndex  Int      @default(0)
+  xpReward    Int      @default(50)
+  isLocked    Boolean  @default(true)
+  topicId     String
+  topic       Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  tasks Task[]
+
+  @@index([topicId])
+}
+
+// ==================== TASKS ====================
+
+model Task {
+  id            String   @id @default(cuid())
+  title         String
+  description   String?
+  type          TaskType @default(QUIZ)
+  content       Json?
+  options       Json?
+  correctAnswer String?
+  explanation   String?
+  xpReward      Int      @default(10)
+  orderIndex    Int      @default(0)
+  levelId       String
+  level         Level    @relation(fields: [levelId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+
+  attempts Attempt[]
+
+  @@index([levelId])
+}
+
+model Attempt {
+  id          String        @id @default(cuid())
+  status      AttemptStatus @default(IN_PROGRESS)
+  answer      String?
+  isCorrect   Boolean?
+  score       Float?
+  timeSpent   Int?
+  studentId   String
+  student     Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  taskId      String
+  task        Task          @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  createdAt   DateTime      @default(now())
+  completedAt DateTime?
+
+  @@index([studentId])
+  @@index([taskId])
+}
+
+// ==================== GAMIFICATION ====================
+
+model XpEvent {
+  id        String   @id @default(cuid())
+  amount    Int
+  reason    String
+  metadata  Json?
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([studentId])
+  @@index([createdAt])
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  title       String
+  description String?
+  icon        String?
+  xpReward    Int      @default(0)
+  condition   Json?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  students StudentAchievement[]
+}
+
+model StudentAchievement {
+  id            String      @id @default(cuid())
+  studentId     String
+  student       Student     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  unlockedAt    DateTime    @default(now())
+
+  @@unique([studentId, achievementId])
+  @@index([studentId])
+}
+
+model DailyGoal {
+  id          String   @id @default(cuid())
+  date        DateTime @default(now())
+  targetXp    Int      @default(50)
+  earnedXp    Int      @default(0)
+  isCompleted Boolean  @default(false)
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, date])
+  @@index([studentId])
+}
+
+model Streak {
+  id          String   @id @default(cuid())
+  studentId   String   @unique
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  currentDays Int      @default(0)
+  longestDays Int      @default(0)
+  lastCheckIn DateTime @default(now())
+
+  @@index([studentId])
+}
+
+// ==================== TEAMS & TOURNAMENTS ====================
+
+model Team {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  avatarUrl   String?
+  totalXp     Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  students    Student[]
+  members     TeamMember[]
+  tournaments TournamentMember[]
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  role      String   @default("MEMBER")
+  joinedAt  DateTime @default(now())
+
+  @@unique([teamId, studentId])
+}
+
+model Tournament {
+  id          String           @id @default(cuid())
+  name        String
+  description String?
+  status      TournamentStatus @default(UPCOMING)
+  startDate   DateTime
+  endDate     DateTime
+  seasonId    String?
+  createdAt   DateTime         @default(now())
+
+  members TournamentMember[]
+}
+
+model TournamentMember {
+  id           String     @id @default(cuid())
+  tournamentId String
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  teamId       String?
+  team         Team?      @relation(fields: [teamId], references: [id])
+  studentId    String?
+  student      Student?   @relation(fields: [studentId], references: [id])
+  score        Int        @default(0)
+  joinedAt     DateTime   @default(now())
+
+  @@index([tournamentId])
+}
+
+model Season {
+  id        String   @id @default(cuid())
+  name      String
+  startDate DateTime
+  endDate   DateTime
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+// ==================== NOTIFICATIONS ====================
+
+model Notification {
+  id        String           @id @default(cuid())
+  type      NotificationType
+  title     String
+  message   String?
+  data      Json?
+  isRead    Boolean          @default(false)
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime         @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+// ==================== AI ====================
+
+model AiAnalysis {
+  id        String   @id @default(cuid())
+  type      String
+  input     Json?
+  output    Json?
+  model     String?
+  studentId String?
+  student   Student? @relation(fields: [studentId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@index([studentId])
+}
+
+model ErrorHistory {
+  id        String   @id @default(cuid())
+  topic     String?
+  taskId    String?
+  mistake   String?
+  aiAdvice  String?
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([studentId])
+  @@index([createdAt])
+}
