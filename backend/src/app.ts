@@ -8,6 +8,9 @@ import { errorHandler, notFound } from './middleware/error.middleware.ts';
 import authRoutes from './modules/auth/auth.routes.ts';
 import usersRoutes from './modules/users/users.routes.ts';
 import invitesRoutes from './modules/invites/invites.routes.ts';
+import coursesRoutes from './modules/courses/courses.routes.ts';
+import tasksRoutes from './modules/tasks/tasks.routes.ts';
+import gamificationRoutes from './modules/gamification/gamification.routes.ts';
 
 const app = express();
 
@@ -42,6 +45,9 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/invites', invitesRoutes);
+app.use('/api/courses', coursesRoutes);
+app.use('/api/tasks', tasksRoutes);
+app.use('/api/gamification', gamificationRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
