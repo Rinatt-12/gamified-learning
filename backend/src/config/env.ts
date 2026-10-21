@@ -14,7 +14,7 @@ export const env = {
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
   
   GROQ_API_KEY: process.env.GROQ_API_KEY || '',
-  GROQ_MODEL: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+  GROQ_MODEL: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
   
   ADMIN_EMAIL: process.env.ADMIN_EMAIL || 'admin@learning.kz',
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || 'Admin123!',
