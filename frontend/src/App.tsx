@@ -4,7 +4,16 @@ import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import MainLayout from './components/layout/MainLayout';
 import StudentDashboard from './pages/student/Dashboard';
+import Courses from './pages/student/Courses';
+import CourseDetail from './pages/student/CourseDetail';
+import TaskView from './pages/student/TaskView';
+import Leaderboard from './pages/student/Leaderboard';
+import Teams from './pages/student/Teams';
+import Profile from './pages/student/Profile';
 import TeacherDashboard from './pages/teacher/Dashboard';
+import TeacherStudents from './pages/teacher/Students';
+import AIGenerator from './pages/teacher/AIGenerator';
+import TeacherAnalytics from './pages/teacher/Analytics';
 import AdminDashboard from './pages/admin/Dashboard';
 
 function ProtectedRoute({ roles }: { roles?: Array<'STUDENT' | 'TEACHER' | 'ADMIN'> }) {
@@ -33,10 +42,19 @@ export default function App() {
         <Route element={<MainLayout />}>
           <Route element={<ProtectedRoute roles={['STUDENT']} />}>
             <Route path="/student" element={<StudentDashboard />} />
+            <Route path="/student/courses" element={<Courses />} />
+            <Route path="/student/courses/:courseId" element={<CourseDetail />} />
+            <Route path="/student/tasks/:taskId" element={<TaskView />} />
+            <Route path="/student/leaderboard" element={<Leaderboard />} />
+            <Route path="/student/teams" element={<Teams />} />
+            <Route path="/student/profile" element={<Profile />} />
           </Route>
 
           <Route element={<ProtectedRoute roles={['TEACHER']} />}>
             <Route path="/teacher" element={<TeacherDashboard />} />
+            <Route path="/teacher/students" element={<TeacherStudents />} />
+            <Route path="/teacher/ai-generator" element={<AIGenerator />} />
+            <Route path="/teacher/analytics" element={<TeacherAnalytics />} />
           </Route>
 
           <Route element={<ProtectedRoute roles={['ADMIN']} />}>

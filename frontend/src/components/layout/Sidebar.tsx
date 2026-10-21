@@ -10,6 +10,7 @@ import {
   GraduationCap,
   Ticket,
   ShieldCheck,
+  Sparkles,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/auth.store';
 
@@ -28,8 +29,8 @@ export default function Sidebar() {
   const teacherLinks = [
     { to: '/teacher', icon: LayoutDashboard, label: t('nav.dashboard') },
     { to: '/teacher/students', icon: GraduationCap, label: t('nav.students') },
+    { to: '/teacher/ai-generator', icon: Sparkles, label: 'AI Генератор' },
     { to: '/teacher/analytics', icon: BarChart3, label: t('nav.analytics') },
-    { to: '/teacher/profile', icon: User, label: t('nav.profile') },
   ];
 
   const adminLinks = [
