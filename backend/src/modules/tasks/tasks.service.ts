@@ -15,7 +15,6 @@ export async function getTask(taskId: string, studentId: string) {
     throw new AppError(404, 'Тапсырма табылмады');
   }
 
-  // Бұрынғы әрекеттер
   const previousAttempts = await prisma.attempt.findMany({
     where: { studentId, taskId },
     orderBy: { createdAt: 'desc' },
@@ -35,7 +34,6 @@ export async function getTask(taskId: string, studentId: string) {
       course: task.level.topic.course.title,
     },
     previousAttempts,
-    // correctAnswer мен explanation ЖІБЕРІЛМЕЙДІ! (тексеру серверде)
   };
 }
 
@@ -51,7 +49,6 @@ export async function submitAttempt(
 
   const isCorrect = task.correctAnswer === input.answer;
 
-  // Attempt жазу
   const attempt = await prisma.attempt.create({
     data: {
       studentId,
@@ -67,9 +64,9 @@ export async function submitAttempt(
 
   let xpResult = null;
   let aiAdvice = null;
+  let unlockedLevel = null;
 
   if (isCorrect) {
-    // XP беру (серверде!)
     const bonus = await checkFirstAttempt(studentId, taskId);
     const xpAmount = task.xpReward + (bonus ? 5 : 0);
 
@@ -80,11 +77,11 @@ export async function submitAttempt(
       metadata: { taskId, levelId: task.levelId },
     });
 
-    // Streak update
     await updateStreak(studentId);
+
+    // 🔓 ДЕҢГЕЙ АШУ ЛОГИКАСЫ
+    unlockedLevel = await tryUnlockNextLevel(task.levelId, studentId);
   } else {
-    // Қате — AI кеңес (кейін AI модулінде)
-    // Қазір тек explanation
     aiAdvice = task.explanation || 'Қайталап көріңіз';
   }
 
@@ -95,6 +92,72 @@ export async function submitAttempt(
     explanation: task.explanation,
     xp: xpResult,
     aiAdvice,
+    unlockedLevel,
+  };
+}
+
+// 🔓 Деңгей ашу функциясы
+async function tryUnlockNextLevel(levelId: string, studentId: string) {
+  // Осы деңгейдің барлық тапсырмалары
+  const levelTasks = await prisma.task.findMany({
+    where: { levelId },
+    select: { id: true },
+  });
+
+  if (levelTasks.length === 0) return null;
+
+  // Орындалған тапсырмалар
+  const completed = await prisma.attempt.findMany({
+    where: {
+      studentId,
+      taskId: { in: levelTasks.map((t) => t.id) },
+      isCorrect: true,
+    },
+    distinct: ['taskId'],
+  });
+
+  // Барлығы орындалды ма?
+  if (completed.length < levelTasks.length) return null;
+
+  // Ағымдағы деңгей
+  const currentLevel = await prisma.level.findUnique({
+    where: { id: levelId },
+  });
+
+  if (!currentLevel) return null;
+
+  // Келесі деңгей (сол topic ішінде)
+  const nextLevel = await prisma.level.findFirst({
+    where: {
+      topicId: currentLevel.topicId,
+      orderIndex: { gt: currentLevel.orderIndex },
+    },
+    orderBy: { orderIndex: 'asc' },
+  });
+
+  if (!nextLevel || !nextLevel.isLocked) return null;
+
+  // Ашу
+  const updated = await prisma.level.update({
+    where: { id: nextLevel.id },
+    data: { isLocked: false },
+  });
+
+  // Notification
+  await prisma.notification.create({
+    data: {
+      userId: (await prisma.student.findUnique({ where: { id: studentId } }))!.userId,
+      type: 'NEW_TASK',
+      title: '🔓 Жаңа деңгей ашылды!',
+      message: `"${updated.title}" деңгейі ашылды`,
+      data: { levelId: updated.id },
+    },
+  });
+
+  return {
+    id: updated.id,
+    title: updated.title,
+    xpReward: updated.xpReward,
   };
 }
 
@@ -102,7 +165,7 @@ async function checkFirstAttempt(studentId: string, taskId: string): Promise<boo
   const count = await prisma.attempt.count({
     where: { studentId, taskId, isCorrect: true },
   });
-  return count === 1; // Бұл — бірінші дұрыс әрекет
+  return count === 1;
 }
 
 export async function getAttempts(studentId: string) {
